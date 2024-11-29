@@ -10,10 +10,9 @@ function softError(string $id,\Throwable $error) {
     $error=new SoftErrorException($error);
     ErrorCollection::$errors[$id] = $error;
 }
-function throwSoftError(string $id):void {
-    if($id=='') return;
-    if(!isset(ErrorCollection::$errors[$id])) return;
-    throw ErrorCollection::$errors[$id]->getPrevious();
+function getSoftError(string $id):?\Throwable
+{
+    return ErrorCollection::$errors[$id] ?? null;
 }
 
 function getLastSoftError(): SoftErrorException {
