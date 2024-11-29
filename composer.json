@@ -1,0 +1,21 @@
+{
+  "name": "foamycastle/softerror",
+  "description": "a package allowing the collection of errors instead of the throwing of errors, and events to trigger upon these errors",
+  "authors": [
+    {
+      "name": "Aaron Sollman",
+      "email": "unclepong@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Foamycastle\\SoftError\\": "src"
+    },
+    "files": [
+      "functions.php"
+    ]
+  }
+}
