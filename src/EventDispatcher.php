@@ -29,7 +29,7 @@ class EventDispatcher
     {
         foreach ($this->listeners[$event] as $priority=>$priorityLevel) {
             foreach ($priorityLevel as $listener) {
-                $listener($priority);
+                $listener(...$args);
             }
         }
     }
