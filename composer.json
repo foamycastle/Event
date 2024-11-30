@@ -1,5 +1,5 @@
 {
-  "name": "foamycastle/softerror",
+  "name": "foamycastle/event",
   "description": "a package allowing the collection of errors instead of the throwing of errors, and events to trigger upon these errors",
   "authors": [
     {
@@ -16,7 +16,8 @@
       "Foamycastle\\SoftError\\": "src"
     },
     "files": [
-      "functions.php"
+      "functions.php",
+      "src/ErrorConstants.php"
     ]
   }
 }
