@@ -11,4 +11,6 @@ interface ListenerApi
      * @return mixed
      */
     function __invoke(...$args):mixed;
+
+    function getId():?string;
 }

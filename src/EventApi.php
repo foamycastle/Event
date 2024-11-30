@@ -15,12 +15,6 @@ interface EventApi extends \ArrayAccess, \Iterator
     function dispatch(...$args):void;
 
     /**
-     * Fire a non-blocking event
-     * @param ...$args
-     * @return void
-     */
-    function dispatchAsync(...$args):void;
-    /**
      * Return an array of Listeners
      * @return array<string,ListenerApi>
      */
@@ -29,10 +23,9 @@ interface EventApi extends \ArrayAccess, \Iterator
     /**
      * Add a listener to the stack
      * @param ListenerApi $listener The callback function
-     * @param string|null $id An optional ID if the listener will need to be removed at a later time
      * @return void
      */
-    function addListener(ListenerApi $listener, ?string $id=null):void;
+    function addListener(ListenerApi $listener):void;
 
     /**
      * Remove a listener from the call stack.  If the listener was not added with an ID,
@@ -45,8 +38,8 @@ interface EventApi extends \ArrayAccess, \Iterator
     /**
      * Indicate that a listener's ID is present in the call stack
      * @param string $id The ID of the callback function
-     * @return bool TRUE if the ID exists in the call stack
+     * @return ListenerApi|null returns the object if the ID is found, null if it is not
      */
-    function hasListener(string $id):bool;
+    function hasListener(string $id):null|ListenerApi;
 
 }

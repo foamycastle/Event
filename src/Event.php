@@ -11,7 +11,7 @@ abstract class Event implements EventApi
 
     /**
      * The list of callables associated with an event
-     * @var array<string,callable>
+     * @var ListenerApi[]
      */
     protected array $callstack;
 
@@ -29,6 +29,42 @@ abstract class Event implements EventApi
         };
     }
 
+    function dispatch(...$args): void
+    {
+        foreach($this->getListeners() as $listener) {
+            $listener(...$args);
+        }
+    }
+
+    function getListeners(): array
+    {
+        return $this->callstack ?? [];
+    }
+
+    function addListener(ListenerApi $listener): void
+    {
+        $this->callstack[] = $listener;
+    }
+
+    function removeListener(string $id): void
+    {
+        $unset=false;
+        foreach($this->callstack as $listener){
+            if($listener->getId() === $id) unset($listener);
+            $unset=true;
+        }
+        if($unset){
+            $this->callstack = array_filter($this->callstack, fn($l) => !empty($l));
+        }
+    }
+
+    function hasListener(string $id): null|ListenerApi
+    {
+        foreach ($this->callstack as &$listener) {
+            if ($listener->getId() === $id) return $listener;
+        }
+        return null;
+    }
 
 
 }

@@ -21,4 +21,9 @@ abstract class Listener implements ListenerApi
         $this->callback = $callback;
         $this->id = $id;
     }
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
 }
