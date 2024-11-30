@@ -1,21 +1,34 @@
 <?php
 
-namespace Foamycastle\SoftError;
+namespace Foamycastle\Event;
 
-abstract class Event
+
+/**
+ * @property-read string $name
+ */
+abstract class Event implements EventApi
 {
+
+    /**
+     * The list of callables associated with an event
+     * @var array<string,callable>
+     */
+    protected array $callstack;
+
     public function __construct(
-        string $name,
-    )
-    {
-        $this->name = $name;
+        private string $name
+    ){
+        $this->name = strtolower($name);
     }
 
-    public function getName():string
+    public function __get($name): mixed
     {
-        return $this->name;
+        return @match ($name) {
+            'name' => $this->name,
+            default => null,
+        };
     }
 
-    abstract public function __invoke():mixed;
+
 
 }

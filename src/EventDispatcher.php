@@ -1,36 +1,59 @@
 <?php
 
-namespace Foamycastle\SoftError;
+namespace Foamycastle\Event;
 
-class EventDispatcher
+abstract class EventDispatcher implements EventDispatcherApi
 {
+
     /**
-     * @var array<array-key,array<array-key,Event>>
+     *
+     * @var EventDispatcherApi[]
      */
-    protected array $listeners = [];
-    public function __construct()
+    private static array $dispatchers=[];
+    /**
+     * A collection of events the dispatcher is responsible for firing
+     * @var EventApi[]
+     */
+    protected array $events = [];
+
+    public function __construct(?array $events = null)
     {
-    }
-    public function addListener(string $name, callable|Event $listener,int $priority=0):void
-    {
-        if($priority<0) $priority=0;
-        $this->listeners[$name][$priority][]=$listener;
-        ksort($this->listeners[$name]);
+        $this->events = $events ?? [];
     }
 
-    public function removeListener(string $name):void
+    static function hasEvent(string|Event $event): bool
     {
-        if (isset($this->listeners[$name])) {
-            unset($this->listeners[$name]);
+        if($event instanceof EventApi) {
+            $event=$event->name;
         }
-    }
+        return isset(self::$dispatchers[$event]);
 
-    public function dispatch(string $event,...$args):void
+    }
+    public static function __callStatic($name, $arguments):mixed
     {
-        foreach ($this->listeners[$event] as $priority=>$priorityLevel) {
-            foreach ($priorityLevel as $listener) {
-                $listener(...$args);
-            }
+        $name=strtolower($name);
+        if(!self::hasEvent($name)) return null;
+        $events=self::$dispatchers[$name]->getEvents();
+        if(is_string($arguments)){
+            $arguments=[$arguments];
         }
+        $arguments=array_filter($arguments,fn($arg)=>is_string($arg));
+        $eventsToDispatch=array_filter($events, fn($event)=>in_array($event->getName(),$arguments));
+
+        return (match(strtolower($name)) {
+            'async'=>function (...$arguments) use ($eventsToDispatch) {
+                while(current($eventsToDispatch)!==false) {
+                    current($eventsToDispatch)->dispatchAsync(...$arguments);
+                    next($eventsToDispatch);
+                }
+            },
+            'sync'=>function (...$arguments) use ($eventsToDispatch) {
+                while(current($eventsToDispatch)!==false) {
+                    current($eventsToDispatch)->dispatch(...$arguments);
+                    next($eventsToDispatch);
+                }
+            },
+            default=>fn()=>null
+        })();
     }
 }

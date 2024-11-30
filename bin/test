@@ -3,13 +3,3 @@
 
 include_once __DIR__ . '/../vendor/autoload.php';
 
-$errorEvent=new \Foamycastle\SoftError\ErrorEvent('error');
-
-$exceptionEvent=new \Foamycastle\SoftError\ExceptionEvent('exception');
-$dispatcher=new \Foamycastle\SoftError\EventDispatcher();
-$dispatcher->addListener('onError',$errorEvent,7);
-$dispatcher->addListener('onError',function($x){echo "Error. Priority=$x".PHP_EOL;},5);
-$dispatcher->addListener('turd',$errorEvent,6);
-$dispatcher->addListener('onError',$errorEvent,3);
-$dispatcher->addListener('onException',$exceptionEvent);
-$dispatcher->dispatch('onError');
