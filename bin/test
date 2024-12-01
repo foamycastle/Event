@@ -1,5 +1,27 @@
 #!/usr/bin/env php
 <?php
 
+use Foamycastle\Event\Event;
+use Foamycastle\Event\EventDispatcher;
+
+
 include_once __DIR__ . '/../vendor/autoload.php';
 
+$countEvent = new Event('onDivideBy100');
+$countEvent['divideBy10'] = function (int $number) {
+    echo "Divide by 100: $number\n";
+};
+
+$primeNumberEvent = new Event('onPrimeNumber');
+$primeNumberEvent[]=function (int $number) {
+    echo "Prime number: $number\n";
+};
+$dispatcher = new EventDispatcher('counter');
+
+$dispatcher->addEvent($countEvent, $primeNumberEvent);
+
+for($i=0;$i<=1000;$i++){
+    if($i%100==0) {
+        $dispatcher['onDivideBy100']($i);
+    }
+}

@@ -9,7 +9,7 @@ abstract class Listener implements ListenerApi
      * The event procedure
      * @var callable|null
      */
-    private $callback;
+    protected $callback;
 
     /**
      * The optional ID by which a listener may be known

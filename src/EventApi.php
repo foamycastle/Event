@@ -6,11 +6,12 @@ use Reflector;
 
 interface EventApi extends \ArrayAccess, \Iterator
 {
+    public function __invoke(...$args):void;
 
     /**
      * Fire a blocking event
      * @param ...$args
-     * @return void
+     * @return mixed
      */
     function dispatch(...$args):void;
 

@@ -17,5 +17,10 @@
     "files": [
 
     ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Foamycastle\\Event\\Example\\": "examples"
+    }
   }
 }

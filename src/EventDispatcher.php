@@ -2,7 +2,7 @@
 
 namespace Foamycastle\Event;
 
-abstract class EventDispatcher implements EventDispatcherApi
+class EventDispatcher implements EventDispatcherApi
 {
 
     /**
@@ -16,44 +16,85 @@ abstract class EventDispatcher implements EventDispatcherApi
      */
     protected array $events = [];
 
-    public function __construct(?array $events = null)
+    public function __construct(private string $id)
     {
-        $this->events = $events ?? [];
+        if(empty($events)) return;
+        self::$dispatchers[$this->id]=$this;
+    }
+    public function __destruct()
+    {
+        if(isset(self::$dispatchers[$this->id])) {
+            unset(self::$dispatchers[$this->id]);
+        }
     }
 
-    static function hasEvent(string|Event $event): bool
+    function hasEvent(string|Event $event): bool
     {
         if($event instanceof EventApi) {
             $event=$event->name;
         }
-        return isset(self::$dispatchers[$event]);
-
+        return !empty(array_filter($this->events, fn($event)=>$event->name==$event));
     }
+
+    function addEvent(...$events): void
+    {
+        foreach($events as $event) {
+            if(!($event instanceof EventApi)) continue;
+            $this->events[$event->name]=$event;
+        }
+    }
+
+    function removeEvent(Event|string $event): void
+    {
+        if($event instanceof EventApi) {
+            $event=$event->name;
+        }
+        unset($this->events[$event]);
+    }
+    public function dispatchEvent(Event|string $event, ...$args): mixed
+    {
+        if($event instanceof EventApi) {
+            $event=$event->name;
+        }
+        return $this->events[$event]->dispatch(...$args);
+    }
+
+    function getEvents(): array
+    {
+        return $this->events;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return $this->hasEvent((string)$offset);
+    }
+
+    public function offsetGet(mixed $offset): ?EventApi
+    {
+        return $this->events[(string)$offset] ?? null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if(!($value instanceof Event)) return;
+        $this->events[(string)$offset]=$value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        if(!$this->hasEvent((string)$offset)) return;
+        unset($this->events[(string)$offset]);
+    }
+
+
     public static function __callStatic($name, $arguments):mixed
     {
         $name=strtolower($name);
-        if(!self::hasEvent($name)) return null;
-        $events=self::$dispatchers[$name]->getEvents();
-        if(is_string($arguments)){
-            $arguments=[$arguments];
+        foreach(self::$dispatchers as $dispatcher) {
+            if($dispatcher->hasEvent($name)) {
+                $dispatcher->dispatchEvent($name);
+            }
         }
-        $arguments=array_filter($arguments,fn($arg)=>is_string($arg));
-        $eventsToDispatch=array_filter($events, fn($event)=>in_array($event->getName(),$arguments));
-
-        return (match(strtolower($name)) {
-            'async'=>function (...$arguments) use ($eventsToDispatch) {
-                while(current($eventsToDispatch)!==false) {
-                    current($eventsToDispatch)->dispatchAsync(...$arguments);
-                    next($eventsToDispatch);
-                }
-            },
-            'sync'=>function (...$arguments) use ($eventsToDispatch) {
-                while(current($eventsToDispatch)!==false) {
-                    current($eventsToDispatch)->dispatch(...$arguments);
-                    next($eventsToDispatch);
-                }
-            },
-            default=>fn()=>null
-        })();
+        return null;
     }
 }
