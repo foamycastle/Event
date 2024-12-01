@@ -1,12 +1,13 @@
 {
   "name": "foamycastle/event",
-  "description": "a package allowing the collection of errors instead of the throwing of errors, and events to trigger upon these errors",
+  "description": "a basic event system",
   "authors": [
     {
       "name": "Aaron Sollman",
       "email": "unclepong@gmail.com"
     }
   ],
+  "license": "GPL-3.0-or-later",
   "require": {
     "php": ">=8.1"
   },
@@ -17,10 +18,5 @@
     "files": [
 
     ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Foamycastle\\Event\\Example\\": "examples"
-    }
   }
 }
