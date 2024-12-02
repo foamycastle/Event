@@ -11,7 +11,7 @@ class Event implements EventApi
 
     /**
      * The list of callables associated with an event
-     * @var ListenerApi[]
+     * @var callable[]
      */
     protected array $callstack;
 

@@ -17,7 +17,7 @@ interface EventApi extends \ArrayAccess, \Iterator
 
     /**
      * Return an array of Listeners
-     * @return array<string,ListenerApi>
+     * @return array<string,callable>
      */
     function getListeners():array;
 
